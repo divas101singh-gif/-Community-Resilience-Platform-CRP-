@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CRP | SIH 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        .slate-bg { 
+            background: #334155;
+        }
+        .hero-pattern { 
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(196, 181, 253, 0.15) 0%, transparent 50%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .role-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .role-card:hover { 
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .role-card.selected { 
+            border-color: #3b82f6; 
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="hero-pattern min-h-screen" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Header -->
+            <div class="text-center floating-animation">
+                <h1 class="text-white font-bold mb-6" style="font-size: 48px; line-height: 1.1;">Community Resilience Platform</h1>
+                <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+                <p class="text-white text-lg">Access your emergency management dashboard</p>
+                <div class="mt-4 flex justify-center">
+                    <div class="h-1 w-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Login Card -->
+            <div class="glass-card rounded-2xl p-8 border border-white/20">
+                
+                <!-- Step 1: Role Selection -->
+                <div id="roleSelection">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-6 text-center">Choose Your Role</h3>
+                    <div class="space-y-4 mb-6">
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-5 cursor-pointer" onclick="selectRole('admin')">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                                    <i class="fas fa-user-shield text-red-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 text-lg">Admin</h4>
+                                    <p class="text-sm text-gray-600">Manage alerts and system operations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-5 cursor-pointer" onclick="selectRole('coordinator')">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                                    <i class="fas fa-user-tie text-blue-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 text-lg">Coordinator</h4>
+                                    <p class="text-sm text-gray-600">Coordinate emergency response operations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="role-card border-2 border-gray-200 rounded-xl p-5 cursor-pointer" onclick="selectRole('volunteer')">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                                    <i class="fas fa-heart text-green-600 text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 text-lg">Volunteer</h4>
+                                    <p class="text-sm text-gray-600">Serve your community in times of need</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Authentication Methods -->
+                <div id="authMethods" class="hidden">
+                    <div class="mb-4">
+                        <button onclick="goBackToRoles()" class="text-blue-600 hover:text-blue-500 text-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to role selection
+                        </button>
+                        <h3 class="text-lg font-medium text-gray-900 mt-2">Sign in as <span id="selectedRoleText" class="text-gray-900"></span></h3>
+                    </div>
+
+                    <!-- Google OAuth Sign In -->
+                    <div class="mb-6">
+                        <div id="g_id_onload"
+                             data-client_id="946622161494-1gci62f2ho9cv8qtjheod5udil8iaoin.apps.googleusercontent.com"
+                             data-context="signin"
+                             data-ux_mode="popup"
+                             data-callback="handleGoogleSignIn"
+                             data-auto_prompt="false">
+                        </div>
+                        
+                        <button onclick="initiateGoogleSignIn()" 
+                                class="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-xl shadow-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            Continue with Google
+                        </button>
+                    </div>
+
+                    <div class="relative mb-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+                        </div>
+                    </div>
+
+                    <!-- Email/Password Login -->
+                    <form onsubmit="handleEmailLogin(event)" class="space-y-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <input id="email" name="email" type="email" required placeholder="Enter your email address"
+                                   class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm input-focus focus:outline-none transition-all duration-300">
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input id="password" name="password" type="password" required placeholder="Enter your password"
+                                   class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm input-focus focus:outline-none transition-all duration-300">
+                        </div>
+                        <button type="submit" 
+                                class="w-full btn-primary flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Sign in
+                        </button>
+                    </form>
+                    
+                    <!-- Sign Up Link -->
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-600">
+                            Don't have an account? 
+                            <button onclick="showSignUpForm()" class="font-medium text-blue-600 hover:text-blue-500">Sign up</button>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3: Sign Up Form -->
+                <div id="signUpForm" class="hidden">
+                    <div class="mb-4">
+                        <button onclick="goBackToAuth()" class="text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to sign in
+                        </button>
+                        <h3 class="text-lg font-medium text-gray-900 mt-2">Create account as <span id="signUpRoleText" class="text-blue-600"></span></h3>
+                    </div>
+
+                    <!-- Sign Up Form -->
+                    <form onsubmit="handleSignUp(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                                <input id="firstName" name="firstName" type="text" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                                <input id="lastName" name="lastName" type="text" required 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="signUpEmail" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <input id="signUpEmail" name="email" type="email" required 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="signUpPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input id="signUpPassword" name="password" type="password" required minlength="6"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                        </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                            <input id="confirmPassword" name="confirmPassword" type="password" required 
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <!-- Role-specific fields -->
+                        <div id="volunteerFields" class="hidden space-y-4">
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                <input id="phone" name="phone" type="tel" 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                                <input id="location" name="location" type="text" 
+                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input id="agreeTerms" name="agreeTerms" type="checkbox" required
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="agreeTerms" class="ml-2 block text-sm text-gray-900">
+                                I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-user-plus mr-2"></i>Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Demo Credentials -->
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</h3>
+                    <div class="text-xs text-blue-600 space-y-1">
+                        <p><strong>Admin:</strong> admin@crp.com / admin123</p>
+                        <p><strong>Coordinator:</strong> coordinator@crp.com / coord123</p>
+                        <p><strong>Volunteer:</strong> volunteer@crp.com / vol123</p>
+                    </div>
+                </div>
+
+                <!-- Quick Demo Access -->
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600 mb-2">Quick demo access:</p>
+                    <div class="flex space-x-2">
+                        <button onclick="quickDemoLogin('admin')" 
+                                class="flex-1 px-3 py-2 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200">
+                            Demo Admin
+                        </button>
+                        <button onclick="quickDemoLogin('coordinator')" 
+                                class="flex-1 px-3 py-2 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200">
+                            Demo Coordinator
+                        </button>
+                        <button onclick="quickDemoLogin('volunteer')" 
+                                class="flex-1 px-3 py-2 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200">
+                            Demo Volunteer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center">
+                <div class="flex justify-center items-center space-x-2 mb-4">
+                    <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent flex-1"></div>
+                    <span class="text-slate-300 text-sm font-medium px-4">SIH 2025</span>
+                    <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent flex-1"></div>
+                </div>
+                <p class="text-slate-300 text-sm font-medium">Script Stars Team</p>
+                <div class="mt-3 flex justify-center space-x-4">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedRole = null;
+
+        // Role Selection
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update UI
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show auth methods after a short delay
+            setTimeout(() => {
+                document.getElementById('roleSelection').classList.add('hidden');
+                document.getElementById('authMethods').classList.remove('hidden');
+                document.getElementById('selectedRoleText').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+            }, 300);
+        }
+
+        function goBackToRoles() {
+            document.getElementById('authMethods').classList.add('hidden');
+            document.getElementById('signUpForm').classList.add('hidden');
+            document.getElementById('roleSelection').classList.remove('hidden');
+            selectedRole = null;
+        }
+
+        function goBackToAuth() {
+            document.getElementById('signUpForm').classList.add('hidden');
+            document.getElementById('authMethods').classList.remove('hidden');
+        }
+
+        function showSignUpForm() {
+            if (!selectedRole) {
+                alert('Please select a role first');
+                return;
+            }
+            
+            document.getElementById('authMethods').classList.add('hidden');
+            document.getElementById('signUpForm').classList.remove('hidden');
+            document.getElementById('signUpRoleText').textContent = selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1);
+            
+            // Show volunteer-specific fields if volunteer role is selected
+            if (selectedRole === 'volunteer') {
+                document.getElementById('volunteerFields').classList.remove('hidden');
+            } else {
+                document.getElementById('volunteerFields').classList.add('hidden');
+            }
+        }
+
+        // Google OAuth Integration
+        function initiateGoogleSignIn() {
+            if (!selectedRole) {
+                alert('Please select a role first');
+                return;
+            }
+            
+            // Trigger Google Sign-In
+            google.accounts.id.prompt();
+        }
+
+        function handleGoogleSignIn(response) {
+            if (!selectedRole) {
+                alert('Please select a role first');
+                return;
+            }
+
+            try {
+                // Decode the JWT token from Google
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                
+                // Store user info with selected role
+                const userData = {
+                    email: payload.email,
+                    name: payload.name,
+                    picture: payload.picture,
+                    role: selectedRole,
+                    loginMethod: 'google',
+                    googleToken: response.credential,
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('crp_user', JSON.stringify(userData));
+                
+                // Redirect to role-specific dashboard
+                const dashboards = {
+                    'admin': 'admin-dashboard.html',
+                    'coordinator': 'coordinator-dashboard.html', 
+                    'volunteer': 'volunteer-dashboard.html'
+                };
+                
+                window.location.href = dashboards[selectedRole];
+            } catch (error) {
+                console.error('Error processing Google Sign-In:', error);
+                alert('Google Sign-In failed. Please try again.');
+            }
+        }
+
+        // Initialize Google Sign-In when page loads
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: '946622161494-1gci62f2ho9cv8qtjheod5udil8iaoin.apps.googleusercontent.com',
+                callback: handleGoogleSignIn
+            });
+        }
+
+        // Email/Password Login
+        async function handleEmailLogin(event) {
+            event.preventDefault();
+            
+            if (!selectedRole) {
+                alert('Please select a role first');
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                // Try MongoDB backend login first
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Check if backend role matches selected role
+                    if (data.user.role !== selectedRole) {
+                        alert(`This account is registered as ${data.user.role}, but you selected ${selectedRole}. Please select the correct role.`);
+                        return;
+                    }
+                    
+                    // Store user info
+                    localStorage.setItem('crp_user', JSON.stringify({
+                        email: data.user.email,
+                        role: data.user.role,
+                        token: data.token,
+                        loginMethod: 'email',
+                        loginTime: new Date().toISOString()
+                    }));
+                    
+                    // Redirect to role-specific dashboard
+                    const dashboards = {
+                        'admin': 'admin-dashboard.html',
+                        'coordinator': 'coordinator-dashboard.html', 
+                        'volunteer': 'volunteer-dashboard.html'
+                    };
+                    window.location.href = dashboards[data.user.role];
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                // Fallback to demo login if backend is not available
+                console.log('Backend not available, using demo login');
+                
+                // Check if user has been deleted by admin
+                const registeredUsers = JSON.parse(localStorage.getItem('crp_users') || '[]');
+                const userExists = registeredUsers.find(user => user.email === email);
+                
+                if (!userExists && email !== 'admin@crp.com') {
+                    alert('Account not found or has been removed by administrator. Please contact support.');
+                    return;
+                }
+                
+                // Check locally registered users first
+                const localUsers = JSON.parse(localStorage.getItem('demo_users') || '{}');
+                
+                // Combine demo users with locally registered users
+                const allUsers = {
+                    'admin@crp.com': { password: 'admin123', role: 'admin' },
+                    'coordinator@crp.com': { password: 'coord123', role: 'coordinator' },
+                    'volunteer@crp.com': { password: 'vol123', role: 'volunteer' },
+                    ...localUsers
+                };
+
+                if (allUsers[email] && allUsers[email].password === password) {
+                    // Check if role matches selected role
+                    if (allUsers[email].role !== selectedRole) {
+                        alert(`This account is registered as ${allUsers[email].role}, but you selected ${selectedRole}. Please select the correct role.`);
+                        return;
+                    }
+                    
+                    localStorage.setItem('crp_user', JSON.stringify({
+                        email: email,
+                        role: allUsers[email].role,
+                        fullName: allUsers[email].fullName || 'User',
+                        loginMethod: 'demo',
+                        loginTime: new Date().toISOString()
+                    }));
+                    
+                    const dashboards = {
+                        'admin': 'admin-dashboard.html',
+                        'coordinator': 'coordinator-dashboard.html', 
+                        'volunteer': 'volunteer-dashboard.html'
+                    };
+                    window.location.href = dashboards[allUsers[email].role];
+                } else {
+                    alert('Invalid credentials. Please check your email and password or sign up for a new account.');
+                }
+            }
+        }
+
+        // Quick Demo Login
+        function quickDemoLogin(role) {
+            const userData = {
+                email: `${role}@crp.com`,
+                role: role,
+                loginMethod: 'quick-demo',
+                loginTime: new Date().toISOString()
+            };
+
+            localStorage.setItem('crp_user', JSON.stringify(userData));
+
+            const dashboards = {
+                'admin': 'admin-dashboard.html',
+                'coordinator': 'coordinator-dashboard.html', 
+                'volunteer': 'volunteer-dashboard.html'
+            };
+            window.location.href = dashboards[role];
+        }
+
+        // Sign Up Handler
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            if (!selectedRole) {
+                alert('Please select a role first');
+                return;
+            }
+
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            // Prepare user data
+            const userData = {
+                username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}`,
+                email: email,
+                password: password,
+                role: selectedRole,
+                firstName: firstName,
+                lastName: lastName,
+                fullName: `${firstName} ${lastName}`,
+                phone: phone,
+                location: location
+            };
+
+            try {
+                // Try to register with MongoDB backend
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert('Account created successfully! Please sign in with your credentials.');
+                    
+                    // If volunteer, also create volunteer profile
+                    if (selectedRole === 'volunteer' && phone && location) {
+                        try {
+                            await fetch('http://localhost:3000/api/volunteers', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    fullName: userData.fullName,
+                                    email: userData.email,
+                                    phone: userData.phone,
+                                    location: userData.location,
+                                    skills: [],
+                                    availability: 'anytime',
+                                    status: 'available'
+                                })
+                            });
+                        } catch (volunteerError) {
+                            console.log('Volunteer profile creation failed, but user account created');
+                        }
+                    }
+                    
+                    // Go back to sign in
+                    goBackToAuth();
+                    
+                    // Pre-fill email in sign-in form
+                    document.getElementById('email').value = email;
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                
+                // Fallback: Store locally for demo
+                const existingUsers = JSON.parse(localStorage.getItem('demo_users') || '{}');
+                if (existingUsers[email]) {
+                    alert('Email already exists. Please use a different email.');
+                    return;
+                }
+                
+                existingUsers[email] = {
+                    password: password,
+                    role: selectedRole,
+                    fullName: userData.fullName,
+                    phone: phone,
+                    location: location
+                };
+                
+                localStorage.setItem('demo_users', JSON.stringify(existingUsers));
+                
+                // Update user count for admin statistics
+                const users = JSON.parse(localStorage.getItem('crp_users') || '[]');
+                users.push({
+                    id: Date.now(),
+                    email: email,
+                    role: selectedRole,
+                    fullName: userData.fullName,
+                    phone: phone,
+                    location: location,
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem('crp_users', JSON.stringify(users));
+                
+                alert('Account created successfully (demo mode)! Please sign in with your credentials.');
+                
+                // Go back to sign in
+                goBackToAuth();
+                document.getElementById('email').value = email;
+            }
+        }
+
+        // Check if user is already logged in
+        function checkExistingLogin() {
+            const user = localStorage.getItem('crp_user');
+            if (user) {
+                const userData = JSON.parse(user);
+                const loginTime = new Date(userData.loginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                // Auto-logout after 24 hours
+                if (hoursDiff < 24) {
+                    const dashboards = {
+                        'admin': 'admin-dashboard.html',
+                        'coordinator': 'coordinator-dashboard.html', 
+                        'volunteer': 'volunteer-dashboard.html'
+                    };
+                    window.location.href = dashboards[userData.role];
+                } else {
+                    localStorage.removeItem('crp_user');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingLogin();
+        });
+    </script>
+</body>
+</html>
